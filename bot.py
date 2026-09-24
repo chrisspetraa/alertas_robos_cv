@@ -151,7 +151,28 @@ class Categoria:
     etiqueta: str
     icono: str
     delitos: re.Pattern
-    lugares: Optional[re.Pattern]
+    lugares: Optional[re.Pattern]                    # basta con que aparezcan en el texto
+    lugares_cercanos: Optional[re.Pattern] = None    # solo cuentan si están cerca del delito
+    distancia: int = 6                               # nº máximo de palabras entre delito y lugar_cercano
+
+    def encaja(self, texto_n: str) -> bool:
+        delitos = _posiciones(self.delitos, texto_n)
+        if not delitos:
+            return False
+        if self.lugares is None and self.lugares_cercanos is None:
+            return True
+        if self.lugares is not None and self.lugares.search(texto_n):
+            return True
+        if self.lugares_cercanos is not None:
+            for p in _posiciones(self.lugares_cercanos, texto_n):
+                if any(abs(p - d) <= self.distancia for d in delitos):
+                    return True
+        return False
+
+
+def _posiciones(patron: re.Pattern, texto: str) -> list[int]:
+    """Posición (en nº de palabra) de cada coincidencia. El texto ya viene normalizado con un espacio entre palabras."""
+    return [texto.count(" ", 0, m.start()) for m in patron.finditer(texto)]
 
 
 def cargar_categorias(cfg: dict) -> list[Categoria]:
@@ -162,10 +183,44 @@ def cargar_categorias(cfg: dict) -> list[Categoria]:
         delitos = compilar_terminos(c.get("delitos"))
         if delitos is None:
             raise ConfigError(f"La categoría '{clave}' no tiene 'delitos'")
-        cats.append(Categoria(clave, c.get("etiqueta", clave), c.get("icono", "🚨"), delitos, compilar_terminos(c.get("lugares"))))
+        cats.append(Categoria(
+            clave, c.get("etiqueta", clave), c.get("icono", "🚨"), delitos,
+            compilar_terminos(c.get("lugares")), compilar_terminos(c.get("lugares_cercanos")),
+            int(c.get("distancia", 6)),
+        ))
     if not cats:
         raise ConfigError("No hay ninguna categoría activa en config.yaml")
     return cats
+
+
+@dataclass
+class Filtros:
+    """Reglas para descartar noticias que no son un robo real reciente."""
+    exclusiones: Optional[re.Pattern] = None         # en titular o resumen
+    exclusiones_titulo: Optional[re.Pattern] = None  # solo en el titular (juicios, consejos, estadísticas...)
+    frases_ignoradas: Optional[re.Pattern] = None    # expresiones que se borran antes de buscar (p. ej. "como Pedro por su casa")
+    porcentaje_titulo: bool = True                   # titular con "%" = estadística
+
+    def descarta(self, titulo: str, titulo_n: str, texto_n: str) -> bool:
+        if self.exclusiones is not None and self.exclusiones.search(texto_n):
+            return True
+        if self.exclusiones_titulo is not None and self.exclusiones_titulo.search(titulo_n):
+            return True
+        return self.porcentaje_titulo and "%" in titulo
+
+    def limpiar(self, texto_n: str) -> str:
+        if self.frases_ignoradas is None:
+            return texto_n
+        return re.sub(r" {2,}", " ", self.frases_ignoradas.sub(" ", texto_n)).strip()
+
+
+def cargar_filtros(cfg: dict) -> Filtros:
+    return Filtros(
+        exclusiones=compilar_terminos(cfg.get("exclusiones")),
+        exclusiones_titulo=compilar_terminos(cfg.get("exclusiones_titulo")),
+        frases_ignoradas=compilar_terminos(cfg.get("frases_ignoradas")),
+        porcentaje_titulo=bool(cfg.get("ajustes", {}).get("descartar_titulos_con_porcentaje", True)),
+    )
 
 
 @dataclass
@@ -506,7 +561,7 @@ def recolectar_fuente(sesion, fuente: dict, cfg: dict, estado: dict, ahora: date
 # ----------------------------------------------------------------------
 #  Filtrado
 # ----------------------------------------------------------------------
-def filtrar_noticias(noticias: list[Noticia], cats: list[Categoria], geo: Geografia, excl: Optional[re.Pattern],
+def filtrar_noticias(noticias: list[Noticia], cats: list[Categoria], geo: Geografia, filtros: Filtros,
                      estado: dict, ahora: datetime, ajustes: dict, max_edad_h: float) -> list[Alerta]:
     umbral = ajustes.get("similitud_titulos", 0.5)
     limite_edad = timedelta(hours=max_edad_h)
@@ -523,9 +578,10 @@ def filtrar_noticias(noticias: list[Noticia], cats: list[Categoria], geo: Geogra
             continue
         titulo_n = norm(n.titulo)
         texto_n = norm(f"{n.titulo}. {n.resumen[:600]}")
-        if excl and excl.search(texto_n):
+        if filtros.descarta(n.titulo, titulo_n, texto_n):
             continue
-        categoria = next((c for c in cats if c.delitos.search(texto_n) and (c.lugares is None or c.lugares.search(texto_n))), None)
+        limpio = filtros.limpiar(texto_n)
+        categoria = next((c for c in cats if c.encaja(limpio)), None)
         if categoria is None:
             continue
         lugar = geo.localizar(titulo_n, norm(n.resumen[:600]))
@@ -677,7 +733,7 @@ def ejecutar(cfg: dict, ruta_estado: Path, dry_run: bool = False, max_edad_h: Op
     sesion = sesion or crear_sesion(cfg)
     cats = cargar_categorias(cfg)
     geo = Geografia(cfg)
-    excl = compilar_terminos(cfg.get("exclusiones"))
+    filtros = cargar_filtros(cfg)
     estado = cargar_estado(ruta_estado)
     primera_vez = estado.get("creado") is None
     if notificador is None:
@@ -700,7 +756,7 @@ def ejecutar(cfg: dict, ruta_estado: Path, dry_run: bool = False, max_edad_h: Op
         log.error("Ninguna fuente respondió. Revisa la conexión o config.yaml.")
         return 2
 
-    alertas = filtrar_noticias(todas, cats, geo, excl, estado, ahora, ajustes, max_edad_h)
+    alertas = filtrar_noticias(todas, cats, geo, filtros, estado, ahora, ajustes, max_edad_h)
     por_nombre = {s.nombre: s for s in salud}
     for a in alertas:
         por_nombre[a.noticia.origen].coincidencias += 1
