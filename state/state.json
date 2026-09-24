@@ -1,0 +1,136 @@
+{
+ "creado": "2026-09-24T21:54:19.310212+00:00",
+ "descubiertos": {
+  "Alicante Plaza": {
+   "feeds": [
+    "https://alicanteplaza.es/rss/?i=51&dominio=alicanteplaza.es"
+   ],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "Cadena SER Comunitat Valenciana": {
+   "feeds": [],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "Castellón Plaza": {
+   "feeds": [
+    "https://castellonplaza.com/rss/?i=103&dominio=castellonplaza.com"
+   ],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "El Periódico Mediterráneo (Castellón)": {
+   "feeds": [],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "Europa Press Comunitat Valenciana": {
+   "feeds": [
+    "https://www.europapress.es/rss/rss.aspx?ch=292"
+   ],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "Información (Alicante)": {
+   "feeds": [],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "La Verdad (Alicante)": {
+   "feeds": [
+    "https://www.laverdad.es/rss/2.0/?section=",
+    "https://www.laverdad.es/rss/2.0/?section=/ultima-hora"
+   ],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "Las Provincias": {
+   "feeds": [
+    "https://www.lasprovincias.es/rss/2.0/?section=sucesos",
+    "https://www.lasprovincias.es/rss/2.0/?section=/ultima-hora",
+    "https://www.lasprovincias.es/rss/2.0/?section=/sucesos",
+    "https://www.lasprovincias.es/rss/atom/?section=/sucesos"
+   ],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "Levante-EMV": {
+   "feeds": [],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  },
+  "À Punt Mèdia": {
+   "feeds": [
+    "https://apuntmedia.es/rss/",
+    "https://www.apuntmedia.es/rss/"
+   ],
+   "ts": "2026-09-24T21:54:19.310212+00:00"
+  }
+ },
+ "enviadas": {
+  "22b2ad096622f1e4": {
+   "fuente": "Levante-EMV",
+   "t": "2026-09-24T21:54:19.310212+00:00",
+   "titulo": "Los controles nocturnos reducen los robos y desvelan el 'modus operandi' de los ladrones de chalés en Guadassuar y l'Alcúdia",
+   "tok": [
+    "alcudia",
+    "chales",
+    "controles",
+    "desvelan",
+    "guadassuar",
+    "ladrones",
+    "modus",
+    "nocturnos",
+    "operandi",
+    "reducen",
+    "robos"
+   ],
+   "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxORlZmTU16eDZoQThPUURnNm1kckNsUUwwWnVFRktSVk9fY2RZZHpGOXBLQ3dvTXd6QWlEWUE0VlRGbm5vSzV2STV4bUFtaWVfUk5ya2ZRbm1mSGtkOGRucEdzT3kwbVYteWRzc0J0bjI3S0RmMHgyNjZodXRLY3dVS29rMWdVN1JWZlphYkJ2X3JOS2JwSzlPWHY2WXJtRVhMMU9FMnpXeFJ4OXPSAasBQVVfeXFMTkZWZk1Neng2aEE4T1FEZzZtZHJDbFFMMFp1RUZLUlZPX2NkWWR6RjlwS0N3b013ekFpRFlBNFZURm5ub0s1dkk1eG1BbWllX1JOcmtmUW5tZkhrZDhkbnBHc095MG1WLXlkc3NCdG4yN0tEZjB4MjY2aHV0S2N3VUtvazFnVTdSVmZaYWJCdl9yTkticEs5T1h2NllybUVYTDFPRTJ6V3hSeDlz?oc=5"
+  },
+  "be4b901cafaac03f": {
+   "fuente": "Las Provincias",
+   "t": "2026-09-24T21:54:19.310212+00:00",
+   "titulo": "Rocío Osorno confiesa que está en terapia diaria con sus hijos por el asalto a su casa",
+   "tok": [
+    "asalto",
+    "casa",
+    "confiesa",
+    "diaria",
+    "hijos",
+    "osorno",
+    "rocio",
+    "terapia"
+   ],
+   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNNWozVUpzeTFBckxGX0tYNE4tY3FjeXBBY0hhRF9KT2hiSzNLdEw4QTRkOUpSdnliMmpfbGprNm54bGs5WDgxM1ZoN2pzSGhiTzg5eVBfVGp0cWhxRUtoN2Qyd04wdi1Na1RjdmlpZnF0MXpBWEdBX2V5R1RldWNBZzVVanQ4VlllRDBqdTYxSUcyRGpYcDBmMU9GeHlMY1hzTXlTWUcyT2M1UDlESDFzRWNJMA?oc=5"
+  },
+  "ec479982588448b6": {
+   "fuente": "Información",
+   "t": "2026-09-24T21:54:19.310212+00:00",
+   "titulo": "Entra a robar como Pedro por su casa en unas obras en plena calle en San Vicente... pero no contaba con las cámaras de vigilancia",
+   "tok": [
+    "calle",
+    "camaras",
+    "casa",
+    "contaba",
+    "entra",
+    "obras",
+    "pedro",
+    "plena",
+    "robar",
+    "unas",
+    "vicente",
+    "vigilancia"
+   ],
+   "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPYTg0OXNCN0NTTXJiNncyaHItU19QVUM3MWpVT09DZXJ6LW1WMEtLc0R3eEpMelQ2UV82S1JDYzlRckVnWnVFZHBocmprVjhUZW9CZXRZS2M2c25vZG00UnI5X3Q2d3BfRGlwdnpJMkc4enVTcWpTQ3hael9Jek1HZE9oc1ZlS1hpai02Qk16S1lEc0RmMWhVaNIBngFBVV95cUxNYXI4ekd1aEQxSXdwSE1EU2dtN3JHMnRzbVhzWHBhVU0xLThoUXkwZVphMG85NS1seFFwN1FyRFRpT2prb1hWZnF4YkRQeHZmY0c1VTB5Qm5XY3R1YzA3cHJVdWtZOEJXa1hISXZLX3pSejJiVzl5WVlYX2ttXzA4NmhibkU3bjVXT0hVTDR5X1RlN1p6dW5ZUGw2NkVCZw?oc=5"
+  },
+  "ffbbf9ed0df65ec7": {
+   "fuente": "Actualidad Castellón",
+   "t": "2026-09-24T21:54:19.310212+00:00",
+   "titulo": "A prisión el detenido por siete delitos tras un robo violento en una vivienda de Almassora",
+   "tok": [
+    "almassora",
+    "delitos",
+    "detenido",
+    "prision",
+    "robo",
+    "siete",
+    "violento",
+    "vivienda"
+   ],
+   "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxNUHk3b1gwczBTRFBzOGxHMzNyVmJ0Q2dBaGdpUEU5aTVhc0xjV3lxbU9YbUFuZ0FPZG4weW05dy13aTMxeG8tbWdCUkNkTUZPOFFUczR3WE9reTgzUTdFWUd3RTFiUVpwdVVUd0k5Tlc5UHZBVGNwR191Nnd5NTZnUHV5d2hnUQ?oc=5"
+  }
+ },
+ "version": 1
+}
