@@ -1,0 +1,63 @@
+name: Alertas robos CV
+
+on:
+  schedule:
+    # Cada 10 minutos. GitHub puede retrasar las ejecuciones programadas (a veces 5-30 min en horas punta).
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      accion:
+        description: "Qué quieres hacer"
+        type: choice
+        default: simulacro
+        options:
+          - simulacro        # busca noticias y las muestra en el registro, sin enviar nada
+          - probar-telegram  # envía un mensaje de prueba a Telegram
+          - ejecutar         # ejecución real (envía avisos y guarda estado)
+
+permissions:
+  contents: write   # necesario para guardar la lista de noticias ya enviadas (state/state.json)
+
+concurrency:
+  group: alertas-robos
+  cancel-in-progress: false
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar el bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ACCION: ${{ inputs.accion || 'ejecutar' }}
+        run: |
+          case "$ACCION" in
+            simulacro)        python bot.py run --dry-run ;;
+            probar-telegram)  python bot.py test-telegram ;;
+            *)                python bot.py run ;;
+          esac
+
+      - name: Guardar el estado (noticias ya enviadas)
+        if: ${{ !cancelled() && (github.event_name == 'schedule' || inputs.accion == 'ejecutar') }}
+        run: |
+          if [ -n "$(git status --porcelain state/)" ]; then
+            git config user.name "alertas-bot"
+            git config user.email "alertas-bot@users.noreply.github.com"
+            git add state/state.json
+            git commit -m "Actualizar estado del bot"
+            git push
+          fi
