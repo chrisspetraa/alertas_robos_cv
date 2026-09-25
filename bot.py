@@ -43,6 +43,11 @@ log = logging.getLogger("alertas")
 BASE_DIR = Path(__file__).resolve().parent
 UTC = timezone.utc
 CV_GENERICA = "Comunitat Valenciana"
+try:
+    from zoneinfo import ZoneInfo
+    HORA_LOCAL = ZoneInfo("Europe/Madrid")
+except Exception:  # sin base de datos de zonas horarias: usamos UTC
+    HORA_LOCAL = UTC
 
 
 class ConfigError(Exception):
@@ -300,12 +305,16 @@ class Alerta:
     lugar: Lugar
 
 
-def entrada_a_noticia(e, fuente: dict, prov_defecto: Optional[str], ahora: datetime) -> Optional[Noticia]:
+def entrada_a_noticia(e, fuente: dict, prov_defecto: Optional[str], ahora: datetime,
+                      agregador: Optional[bool] = None) -> Optional[Noticia]:
     titulo = limpiar_html(e.get("title", ""))
     url = (e.get("link") or "").strip()
     if not titulo or not url:
         return None
-    agregador = fuente.get("tipo", "directa") == "agregador"
+    # Una noticia es "de buscador" si la fuente entera es Google/Bing o si este feed concreto es una búsqueda
+    # (p. ej. "site:levante-emv.com ..."). A esas se les aplican siempre las reglas estrictas de lugar.
+    if agregador is None:
+        agregador = fuente.get("tipo", "directa") == "agregador"
     nombre = fuente["nombre"]
     if agregador:
         src = e.get("source") or {}
@@ -333,7 +342,7 @@ def entrada_a_noticia(e, fuente: dict, prov_defecto: Optional[str], ahora: datet
         url=url,
         fuente=nombre,
         publicada=publicada,
-        ambito=fuente.get("ambito", "regional"),
+        ambito="nacional" if agregador else fuente.get("ambito", "regional"),
         agregador=agregador,
         provincia_defecto=prov_defecto,
         origen=fuente["nombre"],
@@ -453,11 +462,17 @@ def expandir_feed(item) -> tuple[str, Optional[str]]:
     raise ConfigError(f"Entrada de feed no válida: {item!r}")
 
 
+def es_busqueda(item) -> bool:
+    """True si la entrada de 'feeds' es una búsqueda de Google/Bing Noticias."""
+    return isinstance(item, dict) and ("google_news" in item or "bing_news" in item)
+
+
 # ----------------------------------------------------------------------
 #  Estado (lo ya enviado)
 # ----------------------------------------------------------------------
 def estado_vacio() -> dict:
-    return {"version": 1, "creado": None, "enviadas": {}, "descubiertos": {}}
+    # historial: robos detectados con municipio (para las oleadas) · oleadas: zona -> fecha del último aviso de oleada
+    return {"version": 1, "creado": None, "enviadas": {}, "descubiertos": {}, "historial": [], "oleadas": {}}
 
 
 def cargar_estado(ruta: Path) -> dict:
@@ -479,10 +494,61 @@ def guardar_estado(ruta: Path, estado: dict) -> None:
     tmp.replace(ruta)
 
 
-def podar_estado(estado: dict, ahora: datetime, dias: int) -> None:
+def podar_estado(estado: dict, ahora: datetime, dias: int, dias_historial: Optional[int] = None) -> None:
     limite = ahora - timedelta(days=dias)
     for k in [k for k, v in estado["enviadas"].items() if _fecha(v.get("t")) < limite]:
         del estado["enviadas"][k]
+    if dias_historial is not None:
+        limite_h = ahora - timedelta(days=dias_historial)
+        estado["historial"] = [h for h in estado["historial"] if _fecha(h.get("t")) >= limite_h]
+        for z in [z for z, t in estado["oleadas"].items() if _fecha(t) < limite_h]:
+            del estado["oleadas"][z]
+
+
+# ----------------------------------------------------------------------
+#  Oleadas: varios robos en el mismo municipio en pocos días
+# ----------------------------------------------------------------------
+@dataclass
+class ConfigOleadas:
+    activa: bool = True
+    umbral: int = 3          # nº de robos en el mismo municipio para avisar
+    ventana_dias: int = 15   # ... dentro de estos días
+
+
+def cargar_oleadas(cfg: dict) -> ConfigOleadas:
+    o = cfg.get("oleadas") or {}
+    return ConfigOleadas(
+        activa=bool(o.get("activa", True)),
+        umbral=max(2, int(o.get("umbral", 3))),
+        ventana_dias=max(1, int(o.get("ventana_dias", 15))),
+    )
+
+
+def zona_de(lugar: "Lugar") -> Optional[str]:
+    """Clave del municipio ('Valencia|Bétera'). Solo cuenta si la noticia nombra un municipio concreto."""
+    return f"{lugar.provincia}|{lugar.municipio}" if lugar.municipio and lugar.provincia else None
+
+
+def eventos_zona(estado: dict, zona: str, desde: datetime) -> list[dict]:
+    return [h for h in estado["historial"] if h.get("zona") == zona and _fecha(h.get("t")) >= desde]
+
+
+def oleada_activa(estado: dict, zona: str, desde: datetime) -> bool:
+    """Ya se avisó de una oleada en esta zona dentro de la ventana (no se repite el resumen)."""
+    return zona in estado["oleadas"] and _fecha(estado["oleadas"][zona]) >= desde
+
+
+def formatear_oleada(zona: str, eventos: list[dict], ventana_dias: int) -> str:
+    esc = html.escape
+    provincia, municipio = zona.split("|", 1)
+    ordenados = sorted(eventos, key=lambda h: h.get("t", ""))
+    lineas = [f"⚠️ <b>Posible oleada de robos · {esc(provincia)} · {esc(municipio)}</b>",
+              f"{len(eventos)} robos en viviendas en los últimos {ventana_dias} días:", ""]
+    for h in ordenados[-10:]:
+        dia = _fecha(h.get("t")).astimezone(HORA_LOCAL).strftime("%d/%m")
+        lineas.append(f'• {dia} · <a href="{esc(h.get("url", ""), quote=True)}">{esc(h.get("titulo", ""))}</a>')
+    lineas += ["", "<i>Puede haber varias noticias sobre un mismo robo.</i>"]
+    return "\n".join(lineas)
 
 
 def _fecha(texto: Optional[str]) -> datetime:
@@ -501,6 +567,7 @@ class SaludFuente:
     feeds_ok: list = field(default_factory=list)   # (url, nº entradas, entrada más reciente)
     feeds_ko: list = field(default_factory=list)   # (url, motivo)
     descubiertos: bool = False
+    via_buscador: bool = False                     # medio leído a través de Google/Bing Noticias
     coincidencias: int = 0
 
 
@@ -520,12 +587,13 @@ def recolectar_fuente(sesion, fuente: dict, cfg: dict, estado: dict, ahora: date
     timeout = cfg["ajustes"].get("timeout_segundos", 20)
     salud = SaludFuente(fuente["nombre"])
     prov_fuente = fuente.get("default_provincia")
-    validos: list[tuple[str, Optional[str], object]] = []
+    fuente_agregadora = fuente.get("tipo", "directa") == "agregador"
+    validos: list[tuple[str, Optional[str], object, bool]] = []   # (url, provincia, feed, es_busqueda)
 
     for item in fuente.get("feeds") or []:
         url, prov = expandir_feed(item)
         try:
-            validos.append((url, prov, leer_feed(sesion, url, timeout)))
+            validos.append((url, prov, leer_feed(sesion, url, timeout), fuente_agregadora or es_busqueda(item)))
         except FeedError as exc:
             salud.feeds_ko.append((url, str(exc)))
 
@@ -538,21 +606,22 @@ def recolectar_fuente(sesion, fuente: dict, cfg: dict, estado: dict, ahora: date
         if usar_cache:
             for url in cache.get("feeds", []):
                 try:
-                    validos.append((url, None, leer_feed(sesion, url, timeout)))
+                    validos.append((url, None, leer_feed(sesion, url, timeout), fuente_agregadora))
                 except FeedError as exc:
                     salud.feeds_ko.append((url, str(exc)))
         if not validos and (not usar_cache or cache.get("feeds")):
             log.info("   %s: buscando su RSS automáticamente...", fuente["nombre"])
             hallados = descubrir_feeds(sesion, paginas, timeout)
             estado["descubiertos"][fuente["nombre"]] = {"ts": ahora.isoformat(), "feeds": [u for u, _ in hallados]}
-            validos.extend((u, None, d) for u, d in hallados)
+            validos.extend((u, None, d, fuente_agregadora) for u, d in hallados)
         salud.descubiertos = bool(validos)
 
+    salud.via_buscador = bool(validos) and not fuente_agregadora and all(b for *_, b in validos)
     noticias: list[Noticia] = []
-    for url, prov, d in validos:
+    for url, prov, d, busqueda in validos:
         salud.feeds_ok.append((url, len(d.entries), _mas_reciente(d, ahora)))
         for e in d.entries:
-            n = entrada_a_noticia(e, fuente, prov or prov_fuente, ahora)
+            n = entrada_a_noticia(e, fuente, prov or prov_fuente, ahora, agregador=busqueda)
             if n:
                 noticias.append(n)
     return noticias, salud
@@ -586,10 +655,14 @@ def filtrar_noticias(noticias: list[Noticia], cats: list[Categoria], geo: Geogra
             continue
         lugar = geo.localizar(titulo_n, norm(n.resumen[:600]))
         if not lugar.en_cv:
-            if n.ambito == "nacional" and not n.provincia_defecto:
-                continue  # fuente general: exigimos que nombre un lugar de la Comunitat
+            if n.ambito == "nacional":
+                continue  # fuente general o buscador: exigimos que LA PROPIA NOTICIA nombre un lugar real
+                          # de la Comunitat. Que la búsqueda incluyera "Alicante" no basta: Google/Bing pueden
+                          # devolver resultados de otras provincias que solo tocan el tema por encima.
             if geo.nombra_otra_zona(texto_n):
                 continue
+        elif n.ambito == "nacional" and not lugar.municipio and not lugar.provincia and n.provincia_defecto:
+            lugar = Lugar(n.provincia_defecto, None, True)  # "Comunitat Valenciana" genérico + pista de la búsqueda
         tok = tokens_titulo(n.titulo)
         if any(titulos_similares(tok, otro, umbral) for otro in recientes):
             ids_vistos.add(n.id)
@@ -603,10 +676,13 @@ def filtrar_noticias(noticias: list[Noticia], cats: list[Categoria], geo: Geogra
 # ----------------------------------------------------------------------
 #  Mensajes y notificadores
 # ----------------------------------------------------------------------
-def formatear_mensaje(a: Alerta, ahora: datetime) -> str:
+def formatear_mensaje(a: Alerta, ahora: datetime, extra: Optional[str] = None) -> str:
     n = a.noticia
     esc = html.escape
-    lineas = [f"{a.categoria.icono} <b>{esc(a.categoria.etiqueta)}</b> · {esc(a.lugar.texto(n.provincia_defecto))}", ""]
+    lineas = [f"{a.categoria.icono} <b>{esc(a.categoria.etiqueta)}</b> · {esc(a.lugar.texto(n.provincia_defecto))}"]
+    if extra:
+        lineas.append(f"<b>{esc(extra)}</b>")
+    lineas.append("")
     lineas.append(f"<b>{esc(n.titulo)}</b>")
     if n.resumen:
         ini_t, ini_r = norm(n.titulo)[:40], norm(n.resumen)[:40]
@@ -705,15 +781,18 @@ def cargar_config(ruta: Path) -> dict:
     return cfg
 
 
-def resumen_markdown(salud: list[SaludFuente], ahora: datetime, enviadas: int, candidatas: int) -> str:
-    filas = ["## Resumen de la ejecución", "", f"Noticias de robos detectadas: **{candidatas}** · avisos enviados: **{enviadas}**", "",
+def resumen_markdown(salud: list[SaludFuente], ahora: datetime, enviadas: int, candidatas: int, oleadas: int = 0) -> str:
+    filas = ["## Resumen de la ejecución", "",
+             f"Noticias de robos detectadas: **{candidatas}** · avisos enviados: **{enviadas}** · avisos de oleada: **{oleadas}**", "",
              "| Fuente | Estado | Entradas | Última noticia | Coincidencias |", "|---|---|---|---|---|"]
     for s in salud:
         if s.feeds_ok:
             entradas = sum(n for _, n, _ in s.feeds_ok)
             fechas = [f for _, _, f in s.feeds_ok if f]
             ultima = hace_cuanto(ahora - max(fechas)) if fechas else "?"
-            estado = f"OK ({len(s.feeds_ok)} feed{'s' if len(s.feeds_ok) != 1 else ''}" + (", autodetectado" if s.descubiertos else "") + ")"
+            estado = (f"OK ({len(s.feeds_ok)} feed{'s' if len(s.feeds_ok) != 1 else ''}"
+                      + (", autodetectado" if s.descubiertos else "")
+                      + (", vía Google Noticias" if s.via_buscador else "") + ")")
             filas.append(f"| {s.nombre} | {estado} | {entradas} | {ultima} | {s.coincidencias} |")
         else:
             motivo = s.feeds_ko[0][1] if s.feeds_ko else "no se encontró ningún feed"
@@ -776,23 +855,37 @@ def ejecutar(cfg: dict, ruta_estado: Path, dry_run: bool = False, max_edad_h: Op
     limite = ajustes.get("max_alertas_por_ejecucion", 15)
     if len(a_enviar) > limite:
         log.warning("Hay %d avisos; se envían %d ahora y el resto en la siguiente ejecución.", len(a_enviar), limite)
-    enviadas = 0
+    ole = cargar_oleadas(cfg)
+    desde = ahora - timedelta(days=ole.ventana_dias)
+    enviadas = oleadas_enviadas = 0
     for a in a_enviar[:limite]:
-        if notificador.enviar(formatear_mensaje(a, ahora)):
+        zona = zona_de(a.lugar) if ole.activa else None
+        total = len(eventos_zona(estado, zona, desde)) + 1 if zona else 0
+        ya_avisada = bool(zona) and oleada_activa(estado, zona, desde)
+        extra = None
+        if zona and ya_avisada and total >= ole.umbral:
+            extra = f"⚠️ Oleada activa: {total} robos en {a.lugar.municipio} en los últimos {ole.ventana_dias} días"
+        if notificador.enviar(formatear_mensaje(a, ahora, extra)):
             enviadas += 1
             _registrar(estado, a, ahora)
+            _registrar_historial(estado, a, ahora)
+            if zona and not ya_avisada and total >= ole.umbral:
+                if notificador.enviar(formatear_oleada(zona, eventos_zona(estado, zona, desde), ole.ventana_dias)):
+                    estado["oleadas"][zona] = ahora.isoformat()
+                    oleadas_enviadas += 1
     for a in silenciadas:
         _registrar(estado, a, ahora, silenciada=True)
+        _registrar_historial(estado, a, ahora)
 
     if not dry_run:
         if estado["creado"] is None:
             estado["creado"] = ahora.isoformat()
-        podar_estado(estado, ahora, ajustes.get("retencion_dias", 10))
+        podar_estado(estado, ahora, ajustes.get("retencion_dias", 10), ole.ventana_dias + 1)
         guardar_estado(ruta_estado, estado)
 
-    log.info("Resumen: %d fuentes activas de %d · %d noticias de robos nuevas · %d avisos enviados",
-             fuentes_ok, len(salud), len(alertas), enviadas)
-    md = resumen_markdown(salud, ahora, enviadas, len(alertas))
+    log.info("Resumen: %d fuentes activas de %d · %d noticias de robos nuevas · %d avisos enviados · %d oleadas",
+             fuentes_ok, len(salud), len(alertas), enviadas, oleadas_enviadas)
+    md = resumen_markdown(salud, ahora, enviadas, len(alertas), oleadas_enviadas)
     destino = os.environ.get("GITHUB_STEP_SUMMARY")
     if destino:
         try:
@@ -815,6 +908,21 @@ def _registrar(estado: dict, a: Alerta, ahora: datetime, silenciada: bool = Fals
         "tok": sorted(tokens_titulo(n.titulo)),
         **({"silenciada": True} if silenciada else {}),
     }
+
+
+def _registrar_historial(estado: dict, a: Alerta, ahora: datetime) -> None:
+    zona = zona_de(a.lugar)
+    n = a.noticia
+    if not zona or any(h.get("id") == n.id for h in estado["historial"]):
+        return
+    estado["historial"].append({
+        "t": (n.publicada or ahora).isoformat(),
+        "zona": zona,
+        "id": n.id,
+        "titulo": n.titulo[:160],
+        "url": n.url,
+        "fuente": n.fuente,
+    })
 
 
 def probar_telegram(cfg: dict) -> int:

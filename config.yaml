@@ -302,6 +302,20 @@ frases_ignoradas:
   - viviendas de proteccion oficial
 
 # ---------------------------------------------------------------------
+#  OLEADAS
+#  Si en un mismo municipio salen "umbral" robos o más en "ventana_dias"
+#  días, llega un aviso especial con la lista. Mientras dura la oleada,
+#  los siguientes robos de ese municipio llegan marcados "Oleada activa".
+#  Solo cuentan las noticias que nombran el municipio.
+#  Con umbral 2 avisa antes, pero a veces cuenta dos noticias sobre el
+#  mismo robo (p. ej. el robo y, días después, la detención).
+# ---------------------------------------------------------------------
+oleadas:
+  activa: true
+  umbral: 3
+  ventana_dias: 15
+
+# ---------------------------------------------------------------------
 #  GEOGRAFÍA
 #  Sirve para (1) poner "Provincia · Municipio" en el aviso y
 #  (2) descartar noticias de fuera de la Comunitat en fuentes generales.
@@ -579,6 +593,11 @@ fuera_de_zona:
 #               nombren otra zona) | nacional = exige mencionar un lugar de la Comunitat.
 #  - tipo:      directa | agregador (Google/Bing News; se procesan después
 #               de las directas para preferir el enlace del propio medio).
+#  - google_news: búsqueda en Google Noticias. Con "site:dominio" solo trae
+#               noticias de ese periódico: así leemos los que no tienen un
+#               RSS accesible (Levante-EMV, Información, Mediterráneo, SER).
+#               Lo que llega por búsqueda siempre tiene que nombrar un lugar
+#               de la Comunitat en el titular.
 #  "verificada: true" = el feed se comprobó a mano el 19/09/2026.
 #  El resto se prueba automáticamente al ejecutar; mira el resumen de la
 #  ejecución en GitHub Actions para ver cuáles funcionan.
@@ -604,7 +623,8 @@ fuentes:
 
   - nombre: Levante-EMV
     ambito: regional
-    feeds: []
+    feeds:
+      - google_news: "site:levante-emv.com (robo OR robos OR robar OR roban OR ladrones OR asaltan OR butrón) (vivienda OR viviendas OR chalet OR chalets OR casa OR domicilio OR urbanización) when:2d"
     descubrir:
       - https://www.levante-emv.com/sucesos/
       - https://www.levante-emv.com/rss/
@@ -621,7 +641,8 @@ fuentes:
   - nombre: Información (Alicante)
     ambito: regional
     default_provincia: Alicante
-    feeds: []
+    feeds:
+      - google_news: "site:informacion.es (robo OR robos OR robar OR roban OR ladrones OR asaltan OR butrón) (vivienda OR viviendas OR chalet OR chalets OR casa OR domicilio OR urbanización) when:2d"
     descubrir:
       - https://www.informacion.es/sucesos/
       - https://www.informacion.es/rss/
@@ -630,7 +651,8 @@ fuentes:
   - nombre: El Periódico Mediterráneo (Castellón)
     ambito: regional
     default_provincia: Castellón
-    feeds: []
+    feeds:
+      - google_news: "site:elperiodicomediterraneo.com (robo OR robos OR robar OR roban OR ladrones OR asaltan OR butrón) (vivienda OR viviendas OR chalet OR chalets OR casa OR domicilio OR urbanización) when:2d"
     descubrir:
       - https://www.elperiodicomediterraneo.com/sucesos/
       - https://www.elperiodicomediterraneo.com/rss/
@@ -638,7 +660,9 @@ fuentes:
 
   - nombre: Cadena SER Comunitat Valenciana
     ambito: nacional
-    feeds: []
+    feeds:
+      # La SER es nacional: el filtro ya descarta lo que no nombre un lugar de la Comunitat
+      - google_news: "site:cadenaser.com (robo OR robos OR robar OR roban OR ladrones OR asaltan OR butrón) (vivienda OR viviendas OR chalet OR chalets OR casa OR domicilio OR urbanización) when:2d"
     descubrir:
       - https://cadenaser.com/comunitat-valenciana/
       - https://cadenaser.com/rss/
