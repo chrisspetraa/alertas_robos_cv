@@ -9,7 +9,7 @@
   },
   "Cadena SER Comunitat Valenciana": {
    "feeds": [],
-   "ts": "2026-09-24T21:54:19.310212+00:00"
+   "ts": "2026-09-25T11:05:42.603875+00:00"
   },
   "Castellón Plaza": {
    "feeds": [
@@ -19,7 +19,7 @@
   },
   "El Periódico Mediterráneo (Castellón)": {
    "feeds": [],
-   "ts": "2026-09-24T21:54:19.310212+00:00"
+   "ts": "2026-09-25T11:05:42.603875+00:00"
   },
   "Europa Press Comunitat Valenciana": {
    "feeds": [
@@ -29,7 +29,7 @@
   },
   "Información (Alicante)": {
    "feeds": [],
-   "ts": "2026-09-24T21:54:19.310212+00:00"
+   "ts": "2026-09-25T11:05:42.603875+00:00"
   },
   "La Verdad (Alicante)": {
    "feeds": [
@@ -49,7 +49,7 @@
   },
   "Levante-EMV": {
    "feeds": [],
-   "ts": "2026-09-24T21:54:19.310212+00:00"
+   "ts": "2026-09-25T11:05:42.603875+00:00"
   },
   "À Punt Mèdia": {
    "feeds": [
@@ -94,6 +94,21 @@
     "terapia"
    ],
    "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNNWozVUpzeTFBckxGX0tYNE4tY3FjeXBBY0hhRF9KT2hiSzNLdEw4QTRkOUpSdnliMmpfbGprNm54bGs5WDgxM1ZoN2pzSGhiTzg5eVBfVGp0cWhxRUtoN2Qyd04wdi1Na1RjdmlpZnF0MXpBWEdBX2V5R1RldWNBZzVVanQ4VlllRDBqdTYxSUcyRGpYcDBmMU9GeHlMY1hzTXlTWUcyT2M1UDlESDFzRWNJMA?oc=5"
+  },
+  "dc6250c0d1e6ffd4": {
+   "fuente": "Diario de Sevilla",
+   "t": "2026-09-25T11:05:42.603875+00:00",
+   "titulo": "El robo en una vivienda propicia la detención de un peligroso prófugo de la justicia",
+   "tok": [
+    "detencion",
+    "justicia",
+    "peligroso",
+    "profugo",
+    "propicia",
+    "robo",
+    "vivienda"
+   ],
+   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPd1dJa3gzQ1NuQmdFOTRLZlRXRDVJMl9rcFJLT0YxM1ZEQUFkSFB6aERabzF5cnJyMHpvVHYxdzNIOXFfSW9odzlySWJMMV91YnJJYUJpTngxdzlQTXpoRHVVVEtMMzZVSEJfaU1zclVKQ2puVDFsejVHVVZUMU1OakFhS3V4dlUxUUR3UGlVanhwVjAtMnU2OVoyMDZxbXBC0gGmAUFVX3lxTE50VzZ3Y1liVEZWQmo4VlZoX180NHJOdk4tNnAxdFZqaWRTb294X0laRk9hY243Qk1mV2pvSDZ5NlRrR0RtZ1pzZXd0TEtBTVczWXFXY2lOVTVXUk55QmRMS290LTdlUGlPWGlqQ28zNW1BbzZSeExvblJIOWFhTXl3N0ZvenhscmVLbEVBdjY2NW1ILS1yUTZzV1Y5MGVweHc1SWEtVWc?oc=5"
   },
   "ec479982588448b6": {
    "fuente": "Información",
