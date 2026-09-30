@@ -145,6 +145,22 @@
    ],
    "url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxOOVdhNkFqUjUxTk5nV3NiT3lpMGhteTE5TlJlNHVnbEZicjBRTHdSNUhsNThhaXJwWmNGQ1Q4bkhBekNsYjU0STFjQXNmczBVV1JxZy13MVgzMEtaTDVoS0lWN0ttX09yRzl0RVJDeWJWQVhtN2Q2NmpscElEU2V0ZHQ1Y0FlM0RfZWU0anFSb09DMTJsWXcyRU1xMVBjWE8zQnRpNC1mdWk2RDY5Q3gxdXNTbWFMM1NtLTJ0Y0JYcHpGVFN2U2x2dVJodWlBODRYZWFQUk50NVFYOFBSVEs2RTI3d3Y1ZmljUEHSAe8BQVVfeXFMT3JYOTF1cEplV3FmYVNFeE15NUVJb0NQRV96bE1kT0Jrd2prYzFxdDVNdFNsb21kQl8xQi1HcmdBWGh0RGhNN1VTN1d0by1kRU9vdm9Wd1BwSWRaOTZOYThZNWFBN2RWeGZEMTU2M0Y5UjI1UTlpcU16dF96TG1MODdJWko3WUV5RjdzU2VsYzVoQ0xkc2FtcTVWdHVYSTlBM0p0QUUwRFhFaWx2VmsxQ2xCNFhrWHBRYkh0aHYxUmIwMlVEZk9GS2l4SGtGcVhrcTZhdGtHYzdhZlBobGZpWUoyV2NYZXRWVDN6Ui10MUE?oc=5"
   },
+  "83954e7e54f6add5": {
+   "fuente": "Cadena SER",
+   "t": "2026-09-30T09:07:17.350148+00:00",
+   "titulo": "Detenidos dos hombres por robar en una empresa y hallar droga en un domicilio de Burriana",
+   "tok": [
+    "burriana",
+    "detenidos",
+    "domicilio",
+    "droga",
+    "empresa",
+    "hallar",
+    "hombres",
+    "robar"
+   ],
+   "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNU2RuNVN2dU5zZ2Z0QkFwcUhnTFZxcFpYZ2JQQ2ltcnY4c2FJRDJncFMxNmlNZ1pScFc0bTRwUWx0NGpEaDB2c0QwRS0tb0xzSmJwSjFhNTE4YkpMcjhUTUYwbkplN19xMkNydmpXTHU3aE44OWpkVHUtc2VtS2ctOHdONVpOd3R0VVBsZVczNlJIRFVfamNlWEtPdTJzY3cwdlRoZ0FPMVVEa2Y4Yl9kcHFPam1DaU56RFhidmNCVkxtclZoSjZ0RXFKMVhIQVJXYzNHb3JnYUktdFVYS0ZXZms1RDhpQThjMjZBOHhuT1ZfZ9IBhgJBVV95cUxORlZ5TzVIcjlnNmVxUTEzd0t4RTZXb2t1NU1FSGxTaGZZdEpCeEluSGJVUDBCWmYzQWRzdl9Vb0hsX09ZNG5MSERkdi1fX21OYS01aW9zX1prMnlsY2hRQWh4TlFMTUptSlhYeDNSbmd1WEtwV0JFdlNDS0Z0ekt2Y1ZPc1IxUWtneFpjMUlBUHViYzZUYW9kNS15ZUc3RlFuajYtend6Y0dtVVB5RkEweExla3M2NTRwMzY4ZXZPVWw0WlZJZkJUT2ZMZFFzWVdGMTNkWHRYRUNCN1FPbmxXT196SmFmSlEzbnFfWmlCeEtyLTN0c0NicmZ5VG0yaEZXZ2REejdB?oc=5"
+  },
   "8513f26ed085b597": {
    "fuente": "Las Provincias",
    "t": "2026-09-26T17:36:44.185671+00:00",
@@ -308,6 +324,14 @@
    "t": "2026-09-30T07:01:30+00:00",
    "titulo": "El robo en una empresa de Burriana destapa un alijo de droga y objetos sustraídos en una vivienda",
    "url": "https://www.elperiodic.com/burriana/robo-empresa-burriana-destapa-alijo-droga-objetos-sustraidos-vivienda_1095401",
+   "zona": "Castellón|Burriana"
+  },
+  {
+   "fuente": "Cadena SER",
+   "id": "83954e7e54f6add5",
+   "t": "2026-09-30T08:39:13+00:00",
+   "titulo": "Detenidos dos hombres por robar en una empresa y hallar droga en un domicilio de Burriana",
+   "url": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxNU2RuNVN2dU5zZ2Z0QkFwcUhnTFZxcFpYZ2JQQ2ltcnY4c2FJRDJncFMxNmlNZ1pScFc0bTRwUWx0NGpEaDB2c0QwRS0tb0xzSmJwSjFhNTE4YkpMcjhUTUYwbkplN19xMkNydmpXTHU3aE44OWpkVHUtc2VtS2ctOHdONVpOd3R0VVBsZVczNlJIRFVfamNlWEtPdTJzY3cwdlRoZ0FPMVVEa2Y4Yl9kcHFPam1DaU56RFhidmNCVkxtclZoSjZ0RXFKMVhIQVJXYzNHb3JnYUktdFVYS0ZXZms1RDhpQThjMjZBOHhuT1ZfZ9IBhgJBVV95cUxORlZ5TzVIcjlnNmVxUTEzd0t4RTZXb2t1NU1FSGxTaGZZdEpCeEluSGJVUDBCWmYzQWRzdl9Vb0hsX09ZNG5MSERkdi1fX21OYS01aW9zX1prMnlsY2hRQWh4TlFMTUptSlhYeDNSbmd1WEtwV0JFdlNDS0Z0ekt2Y1ZPc1IxUWtneFpjMUlBUHViYzZUYW9kNS15ZUc3RlFuajYtend6Y0dtVVB5RkEweExla3M2NTRwMzY4ZXZPVWw0WlZJZkJUT2ZMZFFzWVdGMTNkWHRYRUNCN1FPbmxXT196SmFmSlEzbnFfWmlCeEtyLTN0c0NicmZ5VG0yaEZXZ2REejdB?oc=5",
    "zona": "Castellón|Burriana"
   }
  ],
