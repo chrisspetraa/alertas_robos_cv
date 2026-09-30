@@ -111,6 +111,23 @@
    ],
    "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE1Bd191cXFjNDBBRWROUVg0ZlVzLW9JTDVVRUo4ZjMydy1vNW95UlgtUDg5ZGlLbE5oR041SVpxVzEtZG4zRlNPUVd5NEtWX3QyVlk3b0VNSEtoU1dBZnJWbkNhWk9JS3ZTRkhSb3c2cnNZMWdhcFpWag?oc=5"
   },
+  "69d2dfe9b1ce33f6": {
+   "fuente": "El Periódico de Aquí",
+   "t": "2026-09-30T07:25:07.198066+00:00",
+   "titulo": "El robo en una empresa de Burriana destapa un alijo de droga y objetos sustraídos en una vivienda",
+   "tok": [
+    "alijo",
+    "burriana",
+    "destapa",
+    "droga",
+    "empresa",
+    "objetos",
+    "robo",
+    "sustraidos",
+    "vivienda"
+   ],
+   "url": "https://www.elperiodic.com/burriana/robo-empresa-burriana-destapa-alijo-droga-objetos-sustraidos-vivienda_1095401"
+  },
   "6dc8e61380842543": {
    "fuente": "Levante-EMV",
    "t": "2026-09-25T12:27:27.541127+00:00",
@@ -284,8 +301,18 @@
    "titulo": "La Guardia Civil detiene a dos hombres por robos y localiza cocaína y hachís en una vivienda de Burriana",
    "url": "https://news.google.com/rss/articles/CBMickFVX3lxTE9NNEZiQWNjZnhZOTZIdWRjeUd0Y3I1SnZ4VEhZUXdEdWVHZXI3ZmZ6Q29FSFk0OHJpOUV6VGJrV2N5YW5fX2VGRzVxd3A0Q0pSUFBsaldZV1hudnZpOFlobnNHVE9NUEFyZWdJQkJkVjhCUQ?oc=5",
    "zona": "Castellón|Burriana"
+  },
+  {
+   "fuente": "El Periódico de Aquí",
+   "id": "69d2dfe9b1ce33f6",
+   "t": "2026-09-30T07:01:30+00:00",
+   "titulo": "El robo en una empresa de Burriana destapa un alijo de droga y objetos sustraídos en una vivienda",
+   "url": "https://www.elperiodic.com/burriana/robo-empresa-burriana-destapa-alijo-droga-objetos-sustraidos-vivienda_1095401",
+   "zona": "Castellón|Burriana"
   }
  ],
- "oleadas": {},
+ "oleadas": {
+  "Castellón|Burriana": "2026-09-30T07:25:07.198066+00:00"
+ },
  "version": 1
 }
